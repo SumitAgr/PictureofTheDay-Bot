@@ -14,7 +14,7 @@ Before you run the bot.py file, you need to replace the Telegram token and NASA 
 After replacing those values, simply go to the working directory and run the python file:
 
 ```python
-$ python bot.py
+python bot.py
 ```
 
 ## Python Libraries
