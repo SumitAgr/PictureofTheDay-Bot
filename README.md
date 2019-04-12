@@ -2,9 +2,11 @@
 
 ![Language](https://img.shields.io/badge/Python-3.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+<img style="float: middle;" src="https://i.imgur.com/kBITfkT.png">
+
 PictureOfTheDay Bot is a Telegram Bot that retrieves NASA's Image of the Day with a single command.
 
-#### Link to the bot - [t.me/PictureofTheDayBot](http://t.me/PictureoftheDayBot)
+#### Link to the bot - <a href="http://t.me/PictureoftheDayBot" target="_blank">t.me/PictureofTheDayBot </a>
 ## Installation
 
 Before you run the bot.py file, you need to replace the Telegram token and NASA API key with your own.
