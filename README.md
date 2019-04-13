@@ -2,6 +2,8 @@
 
 ![Language](https://img.shields.io/badge/Python-3.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![CodeFactor](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot/badge)](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot)
 
+#### Screenshot: 
+
 <img style="float: middle;" src="https://i.imgur.com/kBITfkT.png">
 
 PictureOfTheDay Bot is a Telegram Bot that retrieves NASA's Image of the Day with a single command.
