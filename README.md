@@ -1,6 +1,6 @@
 # PictureofTheDay Bot for Telegram
 
-![Language](https://img.shields.io/badge/Python-3.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Language](https://img.shields.io/badge/Python-3.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![CodeFactor](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot/badge)](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot)
 
 <img style="float: middle;" src="https://i.imgur.com/kBITfkT.png">
 
