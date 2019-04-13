@@ -6,19 +6,22 @@ from telegram.ext import Updater, CommandHandler
 import logging
 import requests
 
+# Import Token and API key
+from config import token, api_key
+
 # Importing the Updater object with token for updates from Telegram API
 # Declaring the Dispatcher object to send information to user
 # Creating the bot variable and adding our token
-updater = Updater(token = 'TOKEN')
+updater = Updater(token = token)
 dispatcher = updater.dispatcher
-bot = telegram.Bot(token = 'TOKEN')
+bot = telegram.Bot(token = token)
 
 # Logging module for debugging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
 # NASA API
-nasa_api_key = 'API KEY'
+nasa_api_key = api_key
 nasa_url = 'https://api.nasa.gov/planetary/apod?api_key={}'.format(nasa_api_key)
 nasa_data = requests.get(nasa_url).json()
 
