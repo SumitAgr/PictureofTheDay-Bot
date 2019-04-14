@@ -31,7 +31,7 @@ title = nasa_data['title']
 explanation = nasa_data['explanation']
 
 # Reply Keyboard
-reply_keyboard = [['/picture']]
+reply_keyboard = [['/picture 🖼']]
 markup = ReplyKeyboardMarkup(reply_keyboard)
 
 # '/start' command
