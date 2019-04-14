@@ -32,7 +32,7 @@ explanation = nasa_data['explanation']
 
 # Reply Keyboard
 reply_keyboard = [['/picture 🖼']]
-markup = ReplyKeyboardMarkup(reply_keyboard)
+markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard = True)
 
 # '/start' command
 def start(bot, update):
