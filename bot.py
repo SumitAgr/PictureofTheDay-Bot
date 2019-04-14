@@ -1,6 +1,7 @@
 # Python-telegram-bot libraries
 import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import ReplyKeyboardMarkup
 
 # Logging and requests libraries
 import logging
@@ -29,9 +30,13 @@ nasa_data = requests.get(nasa_url).json()
 title = nasa_data['title']
 explanation = nasa_data['explanation']
 
+# Reply Keyboard
+reply_keyboard = [['/picture']]
+markup = ReplyKeyboardMarkup(reply_keyboard)
+
 # '/start' command
 def start(bot, update):
-    bot.send_message(chat_id = update.message.chat_id, text = "Hello there! Thank you for starting me! Use the /picture command to see today's NASA image of the day!")
+    bot.send_message(chat_id = update.message.chat_id, text = "Hello there! Thank you for starting me! Use the /picture command to see today's NASA image of the day!", reply_markup = markup)
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -53,6 +58,13 @@ def pictureoftheday_message(bot, update):
 
 pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_message)
 dispatcher.add_handler(pictureoftheday_message_handler)
+
+# Unknown command for error handling
+def unknown(bot, update):
+    bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please try again!")
+
+unknown_handler = MessageHandler(Filters.command, unknown)
+dispatcher.add_handler(unknown_handler)
 
 # Module to start getting data
 updater.start_polling()
