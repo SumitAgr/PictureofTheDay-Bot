@@ -68,4 +68,3 @@ dispatcher.add_handler(unknown_handler)
 
 # Module to start getting data
 updater.start_polling()
-updater.idle()
