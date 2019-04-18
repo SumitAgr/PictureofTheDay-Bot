@@ -24,11 +24,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 # NASA API
 nasa_api_key = api_key
 nasa_url = 'https://api.nasa.gov/planetary/apod?api_key={}'.format(nasa_api_key)
-nasa_data = requests.get(nasa_url).json()
-
-# JSON variables
-title = nasa_data['title']
-explanation = nasa_data['explanation']
 
 # Reply Keyboard
 reply_keyboard = [['/picture 🖼']]
@@ -43,6 +38,10 @@ dispatcher.add_handler(start_handler)
 
 # '/picture' command
 def pictureoftheday_message(bot, update):
+    nasa_data = requests.get(nasa_url).json()
+    title = nasa_data['title']
+    explanation = nasa_data['explanation']
+    
     if 'image' in nasa_data['media_type']:
         image = nasa_data['hdurl']
         bot.send_message(chat_id = update.message.chat_id, text = title)
