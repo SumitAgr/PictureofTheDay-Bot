@@ -45,7 +45,7 @@ def pictureoftheday_message(bot, update):
     if 'image' in nasa_data['media_type']:
         image = nasa_data['hdurl']
         bot.send_message(chat_id = update.message.chat_id, text = title)
-        bot.send_message(chat_id = update.message.chat_id, text = image)
+        bot.send_photo(chat_id = update.message.chat_id, photo = image)
         bot.send_message(chat_id = update.message.chat_id, text = explanation)
     elif 'video' in nasa_data['media_type']:
         video = nasa_data['url']
