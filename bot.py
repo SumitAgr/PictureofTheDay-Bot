@@ -1,7 +1,8 @@
 # Python-telegram-bot libraries
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, ChatAction
+from functools import wraps
 
 # Logging and requests libraries
 import logging
@@ -29,7 +30,21 @@ nasa_url = 'https://api.nasa.gov/planetary/apod?api_key={}'.format(nasa_api_key)
 reply_keyboard = [['/picture 🖼']]
 markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard = True)
 
+# Typing animation to show to user to imitate human interaction
+def send_action(action):
+    def decorator(func):
+        @wraps(func)
+        def command_func(*args, **kwargs):
+            bot, update = args
+            bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
+            return func(bot, update, **kwargs)
+        return command_func
+    return decorator
+
+send_typing_action = send_action(ChatAction.TYPING)
+
 # '/start' command
+@send_typing_action
 def start(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text = "Hello there! Thank you for starting me! Use the /picture command to see today's NASA image of the day!", reply_markup = markup)
 
@@ -37,6 +52,7 @@ start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 # '/picture' command
+@send_typing_action
 def pictureoftheday_message(bot, update):
     nasa_data = requests.get(nasa_url).json()
     title = nasa_data['title']
@@ -59,6 +75,7 @@ pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_mess
 dispatcher.add_handler(pictureoftheday_message_handler)
 
 # Unknown command for error handling
+@send_typing_action
 def unknown(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please try again!")
 
