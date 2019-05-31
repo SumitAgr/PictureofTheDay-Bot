@@ -53,6 +53,8 @@ send_typing_action = send_action(ChatAction.TYPING)
 def start(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text = "Hello there! Thank you for starting me! Use the /picture command to see today's NASA image of the day!", reply_markup = markup)
 
+    print(datetime.datetime.now())
+    print("User {} started the bot!".format(update.message.chat_id))
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -76,6 +78,9 @@ def pictureoftheday_message(bot, update):
     else:
         bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
 
+    print(datetime.datetime.now())
+    print("User {} called the /picture command!".format(update.message.chat_id))
+
 pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_message)
 dispatcher.add_handler(pictureoftheday_message_handler)
 
@@ -84,8 +89,12 @@ dispatcher.add_handler(pictureoftheday_message_handler)
 def unknown(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please try again!")
 
+    print(datetime.datetime.now())
+    print("User {} called an unknown command!".format(update.message.chat_id))
+
 unknown_handler = MessageHandler(Filters.command, unknown)
 dispatcher.add_handler(unknown_handler)
 
 # Module to start getting data
 updater.start_polling()
+updater.idle()
