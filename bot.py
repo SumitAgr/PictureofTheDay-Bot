@@ -1,29 +1,34 @@
+# -*- coding: utf-8 -*-
 # Python-telegram-bot libraries
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup, ChatAction
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import wraps
 
 # Logging and requests libraries
 import logging
 import requests
 
-# Import Token and API key
-from config import token, api_key
+# Import token from config file
+import config
+
+# Import time library
+import time
+import datetime
 
 # Importing the Updater object with token for updates from Telegram API
 # Declaring the Dispatcher object to send information to user
 # Creating the bot variable and adding our token
-updater = Updater(token = token)
+updater = Updater(token = config.token)
 dispatcher = updater.dispatcher
-bot = telegram.Bot(token = token)
+bot = telegram.Bot(token = config.token)
 
 # Logging module for debugging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
 # NASA API
-nasa_api_key = api_key
+nasa_api_key = config.api_key
 nasa_url = 'https://api.nasa.gov/planetary/apod?api_key={}'.format(nasa_api_key)
 
 # Reply Keyboard
@@ -48,6 +53,7 @@ send_typing_action = send_action(ChatAction.TYPING)
 def start(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text = "Hello there! Thank you for starting me! Use the /picture command to see today's NASA image of the day!", reply_markup = markup)
 
+
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
@@ -57,7 +63,6 @@ def pictureoftheday_message(bot, update):
     nasa_data = requests.get(nasa_url).json()
     title = nasa_data['title']
     explanation = nasa_data['explanation']
-    
     if 'image' in nasa_data['media_type']:
         image = nasa_data['hdurl']
         bot.send_message(chat_id = update.message.chat_id, text = title)
