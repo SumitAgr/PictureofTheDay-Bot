@@ -1,6 +1,9 @@
 <h3 align="center">Picture of The Day Bot for Telegram</h3>
 
----
+<p align="center">
+  <a href="" rel="noopener">
+ <img src="https://i.imgur.com/IIt49tD.jpg" alt="Bot logo" height = "100" weight = "100"></a>
+</p>
 
 <p align="center"> 🤖 A Telegram bot that retrieve's NASA renowned picture of the day service (APOD) with a single command!
     <br> 
@@ -45,6 +48,7 @@ Please note: The bot could be slow sometimes as it depends on NASA's API request
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 + [Python-Telegram-Bot](https://python-telegram-bot.org/) - Unofficial Python wrapper for Telegram's API
++ [Amazon AWS EC2](https://aws.amazon.com/ec2/) - Amazon AWS's cloud computing service
 + Requests - Requests library for HTTP Requests
 + Logging - Logging library for debugging
 + Time / DateTime - Time libraries
