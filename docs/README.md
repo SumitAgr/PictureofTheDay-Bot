@@ -1,10 +1,4 @@
-![Bot logo](https://i.imgur.com/V4WEJJN.jpg)
-
 <h3 align="center">Picture of The Day Bot for Telegram</h3>
-
-![Language](https://img.shields.io/badge/Python-3.7-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-[![CodeFactor](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot/badge)](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot)
 
 ---
 
