@@ -17,6 +17,7 @@
 
 <p align="center"> 🤖 A Telegram bot that retrieve's NASA renowned picture of the day service (APOD) with a single command!
     <br> 
+  <b>Use it live here: https://t.me/PictureofTheDayBot</b>
 </p>
 
 ## 📝 Table of Contents
