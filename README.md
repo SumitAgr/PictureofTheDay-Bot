@@ -59,7 +59,7 @@ Please note: The bot could be slow sometimes as it depends on NASA's API request
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 + [Python-Telegram-Bot](https://python-telegram-bot.org/) - Unofficial Python wrapper for Telegram's API
-+ [Amazon AWS EC2](https://aws.amazon.com/ec2/) - Amazon AWS's cloud computing servic
++ [Amazon AWS EC2](https://aws.amazon.com/ec2/) - Amazon AWS's cloud computing service
 + Requests - Requests library for HTTP Requests
 + Logging - Logging library for debugging
 + Time / DateTime - Time libraries
