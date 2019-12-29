@@ -16,6 +16,11 @@ import config
 import time
 import datetime
 
+# TinyDB 
+
+from tinydb import TinyDB, Query
+db = TinyDB('db.json')
+
 # Importing the Updater object with token for updates from Telegram API
 # Declaring the Dispatcher object to send information to user
 # Creating the bot variable and adding our token
@@ -54,7 +59,7 @@ def start(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text = "Hello there! Thank you for starting me! Use the /picture command to see today's NASA image of the day!", reply_markup = markup)
 
     print(datetime.datetime.now())
-    print("User {} started the bot!".format(update.message.chat_id))
+    print("User {} and ID {} started the bot!".format(update.message.chat_id, str(update.message.from_user.username)))
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -62,6 +67,19 @@ dispatcher.add_handler(start_handler)
 # '/picture' command
 @send_typing_action
 def pictureoftheday_message(bot, update):
+
+    if db.contains(Query()['chat_id'] == update.message.chat_id) == False:
+        db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.datetime.now())})
+    else:
+        db.upsert({'time': str(datetime.datetime.now())}, Query()['chat_id'] == update.message.chat_id)
+
+    #difference = last_time -
+
+    user = Query()
+    result = db.search((user.chat_id == update.message.chat_id) & (user.time != str(0)))
+    time_getter = [sub['time'] for sub in result]
+    print(time_getter[0])
+    
     nasa_data = requests.get(nasa_url).json()
     title = nasa_data['title']
     explanation = nasa_data['explanation']
@@ -79,7 +97,7 @@ def pictureoftheday_message(bot, update):
         bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
 
     print(datetime.datetime.now())
-    print("User {} called the /picture command!".format(update.message.chat_id))
+    print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
 
 pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_message)
 dispatcher.add_handler(pictureoftheday_message_handler)
