@@ -76,7 +76,7 @@ def pictureoftheday_message(bot, update):
 
     # A new user has invoked the picture command since the chat_id cannot be found in database
     if db.contains(Query()['chat_id'] == update.message.chat_id) == False:
-        db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt))})
+        db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
 
         nasa_data = requests.get(nasa_url).json()
         title = nasa_data['title']
@@ -111,7 +111,7 @@ def pictureoftheday_message(bot, update):
 
         # If more than 10 minutes have passed, they can reuse the command
         if int(minutes_diff) >= 10:
-            db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt))}, Query()['chat_id'] == update.message.chat_id)
+            db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
 
             nasa_data = requests.get(nasa_url).json()
             title = nasa_data['title']
@@ -136,9 +136,6 @@ def pictureoftheday_message(bot, update):
             print("User {} and ID {} spammed the /picture command and hit a cooldown!".format(update.message.chat_id, str(update.message.from_user.username)))
     else:
         pass
-
-    print(datetime.now(est_timezone).strftime(fmt))
-    print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
 
 pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_message)
 dispatcher.add_handler(pictureoftheday_message_handler)
