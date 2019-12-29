@@ -52,7 +52,7 @@ def send_action(action):
         @wraps(func)
         def command_func(*args, **kwargs):
             bot, update = args
-            bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
+            bot.send_chat_action(chat_id = update.effective_message.chat_id, action = action)
             return func(bot, update, **kwargs)
         return command_func
     return decorator
@@ -64,7 +64,7 @@ send_typing_action = send_action(ChatAction.TYPING)
 def start(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text = "Hello! Thank you for starting me! Use the /picture command to see today's NASA Image of the Day!", reply_markup = markup)
 
-    print(datetime.datetime.now())
+    print(datetime.now(est_timezone).strftime(fmt))
     print("User {} and ID {} started the bot!".format(update.message.chat_id, str(update.message.from_user.username)))
 
 start_handler = CommandHandler('start', start)
