@@ -1,3 +1,5 @@
 config.py
 __pycache__/config.cpython-36.pyc
-db.json
+__pycache__/test.cpython-36.pyc
+main_potd_db.json
+old_potd_db.json
