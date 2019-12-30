@@ -14,7 +14,7 @@ import config
 
 # Import time library
 import time
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from pytz import timezone
 
 # Using US/Eastern time
@@ -49,6 +49,7 @@ markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard = True)
 
 # DateTime format to use everywhere
 fmt = '%Y-%m-%d %H:%M:%S'
+date_fmt = '%Y-%m-%d'
 
 # Typing animation to show to user to imitate human interaction
 def send_action(action):
@@ -66,7 +67,7 @@ send_typing_action = send_action(ChatAction.TYPING)
 # '/start' command
 @send_typing_action
 def start(bot, update):
-    bot.send_message(chat_id = update.message.chat_id, text = "Hello! Thank you for starting me! Use the /picture command to see today's NASA Image of the Day!", reply_markup = markup)
+    bot.send_message(chat_id = update.message.chat_id, text = "Hello! Thank you for starting me! Use the /picture command to see today's NASA Image of the Day!")
 
     print(datetime.now(est_timezone).strftime(fmt))
     print("User {} and ID {} started the bot!".format(update.message.chat_id, str(update.message.from_user.username)))
@@ -87,7 +88,7 @@ def pictureoftheday_message(bot, update):
         explanation = nasa_data['explanation']
         if 'image' in nasa_data['media_type']:
             image = nasa_data['hdurl']
-            bot.send_message(chat_id = update.message.chat_id, text = '<b>{}</b>'.format(title), parse_mode = 'HTML', reply_markup = markup)
+            bot.send_message(chat_id = update.message.chat_id, text = '<b>{}</b>'.format(title), parse_mode = 'HTML')
             bot.send_photo(chat_id = update.message.chat_id, photo = image)
             bot.send_message(chat_id = update.message.chat_id, text = explanation)
             bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
@@ -151,18 +152,26 @@ dispatcher.add_handler(pictureoftheday_message_handler)
 @send_typing_action
 def old_picture(bot, update, args):
     if not args:
-        bot.send_message(chat_id = update.message.chat_id, text = "Please enter a date after the command! For example: <code>/old_picture 20 Feb 2008 </code>", parse_mode = 'HTML', reply_markup = markup)
-    else:
+        bot.send_message(chat_id = update.message.chat_id, text = "Please enter a date after the command! For example: <code>/old_picture 20 Feb 2008 </code>", parse_mode = 'HTML')
+    
+    user_input = "-".join(args)
+    parsed_user_input = parse(user_input)
+    user_input_string = str(parsed_user_input) 
+
+    year = user_input_string[0:4]
+    month = user_input_string[5:7]
+    day = user_input_string[8:10]
+
+    start_date = date(1995, 6, 16)
+
+    entered_date = date(int(year), int(month), int(day))
+
+    end = (datetime.now(est_timezone) - timedelta(1)).strftime(date_fmt)
+    end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10]))
+
+    if start_date <= entered_date <= end_date:
         if old_potd_db.contains(Query()['chat_id'] == update.message.chat_id) == False:
             old_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
-
-            user_input = "-".join(args)
-            parsed_user_input = parse(user_input)
-            user_input_string = str(parsed_user_input)
-
-            year = user_input_string[0:4]
-            month = user_input_string[5:7]
-            day = user_input_string[8:10]
 
             old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
 
@@ -238,6 +247,8 @@ def old_picture(bot, update, args):
                 print("User {} and ID {} spammed the /old_picture command and hit a cooldown!".format(update.message.chat_id, str(update.message.from_user.username)))
         else:
             pass
+    else:
+        bot.send_message(chat_id = update.message.chat_id, text = "Only dates between 16 June 1995 and {} are supported. Please try again!".format((datetime.now(est_timezone) - timedelta(1)).strftime('%d %B %Y')))
 
 old_picture_handler = CommandHandler('old_picture', old_picture, pass_args = True)
 dispatcher.add_handler(old_picture_handler)
@@ -254,5 +265,6 @@ unknown_handler = MessageHandler(Filters.command, unknown)
 dispatcher.add_handler(unknown_handler)
 
 # Module to start getting data
+print("Bot started!")
 updater.start_polling()
 updater.idle()
