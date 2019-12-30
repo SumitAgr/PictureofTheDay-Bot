@@ -209,14 +209,6 @@ def old_picture(bot, update, args):
                 if int(minutes_diff) >= 2:
                     old_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
 
-                    user_input = "-".join(args)
-                    parsed_user_input = parse(user_input)
-                    user_input_string = str(parsed_user_input)
-
-                    year = user_input_string[0:4]
-                    month = user_input_string[5:7]
-                    day = user_input_string[8:10]
-
                     old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
 
                     old_picture_data = requests.get(old_pictures_url).json()
@@ -249,7 +241,7 @@ def old_picture(bot, update, args):
             bot.send_message(chat_id = update.message.chat_id, text = "Only dates between 16 June 1995 and {} are supported. Please try again!".format((datetime.now(est_timezone) - timedelta(1)).strftime('%d %B %Y')))
     else:
         bot.send_message(chat_id = update.message.chat_id, text = "Please enter a date after the command! For example: <code>/old_picture 20 Feb 2008 </code>", parse_mode = 'HTML')
-        
+
 old_picture_handler = CommandHandler('old_picture', old_picture, pass_args = True)
 dispatcher.add_handler(old_picture_handler)
 
