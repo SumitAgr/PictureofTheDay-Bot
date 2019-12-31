@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Python-telegram-bot libraries
 import telegram
-from telegram import ReplyKeyboardMarkup, ChatAction
+from telegram import ChatAction, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import wraps
 
@@ -83,29 +83,8 @@ dispatcher.add_handler(start_handler)
 # '/picture' command
 @send_typing_action
 def pictureoftheday_message(bot, update):
-
-    # A new user has invoked the picture command since the chat_id cannot be found in database
-    if not main_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
-        main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
-
-        nasa_data = requests.get(nasa_url).json()
-
-        if 'image' in nasa_data['media_type']:
-            send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
-            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
-            print("A new user {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
-        
-        elif 'video' in nasa_data['media_type']:
-            send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['url'], nasa_data['explanation'])
-            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
-            print("A new user {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
-        
-        else:
-            bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
-            print("A new user {} and ID {} called the /picture command and an error occured!".format(update.message.chat_id, str(update.message.from_user.username)))
-    
     # If user exists, search the last time they invoked the picture command
-    elif main_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
+    if main_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
 
         user = Query()
         result = main_potd_db.search((user.chat_id == update.message.chat_id) & (user.time != str(0)))
@@ -141,10 +120,27 @@ def pictureoftheday_message(bot, update):
         else:
             bot.send_message(chat_id = update.message.chat_id, text = "You're doing that too much. Please try again in {} minute(s)!".format(10 - int(minutes_diff)))
             print("User {} and ID {} spammed the /picture command and hit a cooldown!".format(update.message.chat_id, str(update.message.from_user.username)))
-    
-    else:
-        pass
 
+    # A new user has invoked the picture command since the chat_id cannot be found in database
+    else:
+        main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
+
+        nasa_data = requests.get(nasa_url).json()
+
+        if 'image' in nasa_data['media_type']:
+            send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
+            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
+            print("A new user {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
+        
+        elif 'video' in nasa_data['media_type']:
+            send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['url'], nasa_data['explanation'])
+            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
+            print("A new user {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
+        
+        else:
+            bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
+            print("A new user {} and ID {} called the /picture command and an error occured!".format(update.message.chat_id, str(update.message.from_user.username)))
+    
 pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_message)
 dispatcher.add_handler(pictureoftheday_message_handler)
 
@@ -168,26 +164,7 @@ def old_picture(bot, update, args):
 
         if start_date <= entered_date <= end_date:
 
-            if not old_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
-
-                old_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
-
-                old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
-                old_picture_data = requests.get(old_pictures_url).json()
-
-                if 'image' in old_picture_data['media_type']:                
-                    send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['hdurl'], old_picture_data['explanation'])
-                    print("A user {} and ID {} called the /old_picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
-                
-                elif 'video' in old_picture_data['media_type']:
-                    send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['url'], old_picture_data['explanation'])
-                    print("A user {} and ID {} called the /old_picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
-                
-                else: 
-                    bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
-                    print("A user {} and ID {} called the /old_picture command and an error occured!".format(update.message.chat_id, str(update.message.from_user.username)))
-            
-            elif old_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
+            if old_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
 
                 old_picture_user = Query()
                 result = old_potd_db.search((old_picture_user.chat_id == update.message.chat_id) & (old_picture_user.time != str(0)))
@@ -221,8 +198,26 @@ def old_picture(bot, update, args):
                 else:
                     bot.send_message(chat_id = update.message.chat_id, text = "You're doing that too much. Please try again in {} minute(s)!".format(2 - int(minutes_diff)))
                     print("User {} and ID {} spammed the /old_picture command and hit a cooldown!".format(update.message.chat_id, str(update.message.from_user.username)))
+
             else:
-                pass
+
+                old_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
+
+                old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
+                old_picture_data = requests.get(old_pictures_url).json()
+
+                if 'image' in old_picture_data['media_type']:                
+                    send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['hdurl'], old_picture_data['explanation'])
+                    print("A user {} and ID {} called the /old_picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
+                
+                elif 'video' in old_picture_data['media_type']:
+                    send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['url'], old_picture_data['explanation'])
+                    print("A user {} and ID {} called the /old_picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
+                
+                else: 
+                    bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
+                    print("A user {} and ID {} called the /old_picture command and an error occured!".format(update.message.chat_id, str(update.message.from_user.username)))
+            
         else:
             bot.send_message(chat_id = update.message.chat_id, text = "Only dates between 16 June 1995 and {} are supported. Please try again!".format((datetime.now(est_timezone) - timedelta(1)).strftime('%d %B %Y')))
     else:
