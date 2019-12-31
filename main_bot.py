@@ -28,6 +28,11 @@ old_potd_db = TinyDB('old_potd_db.json')
 # Datetime Parser
 from dateutil.parser import parse
 
+# Date randomizer
+from faker import Faker
+fake = Faker()
+#start_date = datetime.date(year = 1995, month = 6, day = 16)
+
 # Importing the Updater object with token for updates from Telegram API
 # Declaring the Dispatcher object to send information to user
 # Creating the bot variable and adding our token
@@ -83,6 +88,13 @@ dispatcher.add_handler(start_handler)
 # '/picture' command
 @send_typing_action
 def pictureoftheday_message(bot, update):
+    
+    start_date = date(1995, 6, 16)
+    end = (datetime.now(est_timezone) - timedelta(1)).strftime(date_fmt)
+    end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10]))
+
+    randomize_date = fake.date_between(start_date = start_date, end_date = end_date).strftime('%d %B %Y')
+
     # If user exists, search the last time they invoked the picture command
     if main_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
 
@@ -105,12 +117,12 @@ def pictureoftheday_message(bot, update):
 
             if 'image' in nasa_data['media_type']:
                 send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
-                bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
+                bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
                 print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
             
             elif 'video' in nasa_data['media_type']:
                 send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
-                bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
+                bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
                 print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
             
             else:
@@ -129,12 +141,12 @@ def pictureoftheday_message(bot, update):
 
         if 'image' in nasa_data['media_type']:
             send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
-            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
+            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
             print("A new user {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
         
         elif 'video' in nasa_data['media_type']:
             send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['url'], nasa_data['explanation'])
-            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture 13 Jan 2005 </code>', parse_mode = 'HTML')
+            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
             print("A new user {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
         
         else:
@@ -221,7 +233,12 @@ def old_picture(bot, update, args):
         else:
             bot.send_message(chat_id = update.message.chat_id, text = "Only dates between 16 June 1995 and {} are supported. Please try again!".format((datetime.now(est_timezone) - timedelta(1)).strftime('%d %B %Y')))
     else:
-        bot.send_message(chat_id = update.message.chat_id, text = "Please enter a date after the command! For example: <code>/old_picture 20 Feb 2008 </code>", parse_mode = 'HTML')
+        start_date = date(1995, 6, 16)
+        end = (datetime.now(est_timezone) - timedelta(1)).strftime(date_fmt)
+        end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10]))
+
+        randomize_date = fake.date_between(start_date = start_date, end_date = end_date).strftime('%d %B %Y')
+        bot.send_message(chat_id = update.message.chat_id, text = "Please enter a date after the command! For example: <code>/old_picture {} </code>".format(randomize_date), parse_mode = 'HTML')
 
 old_picture_handler = CommandHandler('old_picture', old_picture, pass_args = True)
 dispatcher.add_handler(old_picture_handler)
@@ -229,7 +246,7 @@ dispatcher.add_handler(old_picture_handler)
 # Unknown command for error handling
 @send_typing_action
 def unknown(bot, update):
-    bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please type /picture!")
+    bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please type /picture! or /old_picture")
 
     print(datetime.now(est_timezone))
     print("User {} and ID {} called an unknown command!".format(update.message.chat_id, str(update.message.from_user.username)))
