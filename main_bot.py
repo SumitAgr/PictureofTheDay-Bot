@@ -117,7 +117,7 @@ def pictureoftheday_message(bot, update):
         minutes_diff = (current_time - old_time).total_seconds() / 60.0
 
         # If more than 10 minutes have passed, they can reuse the command
-        if int(minutes_diff) >= 10:
+        if int(minutes_diff) >= 0:
             main_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
 
             nasa_data = requests.get(nasa_url).json()
@@ -206,7 +206,7 @@ def old_picture(bot, update, args):
                 # Calculate how much time has passed since we served the image
                 minutes_diff = (current_time - old_time).total_seconds() / 60.0
 
-                if int(minutes_diff) >= 2:
+                if int(minutes_diff) >= 0:
                     old_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
 
                     old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
