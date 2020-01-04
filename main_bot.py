@@ -24,6 +24,7 @@ est_timezone = timezone('US/Eastern')
 from tinydb import TinyDB, Query
 main_potd_db = TinyDB('main_potd_db.json')
 old_potd_db = TinyDB('old_potd_db.json')
+from tinydb.operations import increment
 
 # Datetime Parser
 from dateutil.parser import parse
@@ -112,6 +113,7 @@ def pictureoftheday_message(bot, update):
         # If more than 10 minutes have passed, they can reuse the command
         if int(minutes_diff) >= 0:
             main_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
+            main_potd_db.update(increment('count'), Query()['chat_id'] == update.message.chat_id)
 
             nasa_data = requests.get(nasa_url).json()
 
@@ -135,7 +137,7 @@ def pictureoftheday_message(bot, update):
 
     # A new user has invoked the picture command since the chat_id cannot be found in database
     else:
-        main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
+        main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username, 'count': 1})
 
         nasa_data = requests.get(nasa_url).json()
 
@@ -191,6 +193,7 @@ def old_picture(bot, update, args):
 
                 if int(minutes_diff) >= 0:
                     old_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
+                    old_potd_db.update(increment('count'), Query()['chat_id'] == update.message.chat_id)
 
                     old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
                     old_picture_data = requests.get(old_pictures_url).json()
@@ -213,7 +216,7 @@ def old_picture(bot, update, args):
 
             else:
 
-                old_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username})
+                old_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username, 'count': 1})
 
                 old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
                 old_picture_data = requests.get(old_pictures_url).json()
