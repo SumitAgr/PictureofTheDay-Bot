@@ -118,12 +118,12 @@ def pictureoftheday_message(bot, update):
             nasa_data = requests.get(nasa_url).json()
 
             if 'image' in nasa_data['media_type']:
-                send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
+                send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['url'], nasa_data['explanation'])
                 bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
                 print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
             
             elif 'video' in nasa_data['media_type']:
-                send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['hdurl'], nasa_data['explanation'])
+                send_information_to_user(bot, update.message.chat_id, nasa_data['title'], nasa_data['url'], nasa_data['explanation'])
                 bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
                 print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
             
@@ -199,7 +199,7 @@ def old_picture(bot, update, args):
                     old_picture_data = requests.get(old_pictures_url).json()
 
                     if 'image' in old_picture_data['media_type']:
-                        send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['hdurl'], old_picture_data['explanation'])
+                        send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['url'], old_picture_data['explanation'])
                         print("A user {} and ID {} called the /old_picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
                     
                     elif 'video' in old_picture_data['media_type']:
@@ -222,7 +222,7 @@ def old_picture(bot, update, args):
                 old_picture_data = requests.get(old_pictures_url).json()
 
                 if 'image' in old_picture_data['media_type']:                
-                    send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['hdurl'], old_picture_data['explanation'])
+                    send_information_to_user(bot, update.message.chat_id, old_picture_data['title'], old_picture_data['url'], old_picture_data['explanation'])
                     print("A user {} and ID {} called the /old_picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
                 
                 elif 'video' in old_picture_data['media_type']:
