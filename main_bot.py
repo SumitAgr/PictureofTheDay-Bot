@@ -32,6 +32,7 @@ from dateutil.parser import parse
 # Date randomizer
 from faker import Faker
 fake = Faker()
+
 # Importing the Updater object with token for updates from Telegram API
 # Declaring the Dispatcher object to send information to user
 # Creating the bot variable and adding our token
@@ -62,16 +63,10 @@ def check_api_data_and_send_info(bot, update, user_chat_id, media_type, title, i
         bot.send_photo(chat_id = user_chat_id, photo = image)
         bot.send_message(chat_id = user_chat_id, text = explanation)
 
-    if 'image' in media_type:
+    if 'image' or 'video' in media_type:
         send_information_to_user(bot, user_chat_id, title, image, explanation)
-        if is_old_picture == False:
+        if is_old_picture != True:
             bot.send_message(chat_id = user_chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
-        print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
-
-    elif 'video' in media_type:
-        send_information_to_user(bot, update.message.chat_id, title, image, explanation)
-        if is_old_picture == False:
-            bot.send_message(chat_id = update.message.chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
         print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
 
     else:
