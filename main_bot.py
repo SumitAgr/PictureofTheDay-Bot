@@ -46,7 +46,7 @@ logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message
 
 # NASA API
 nasa_api_key = config.api_key
-nasa_url = 'https://api.nasa.gov/planetary/apod?api_key={}'.format(nasa_api_key)
+nasa_url = f'https://api.nasa.gov/planetary/apod?api_key={nasa_api_key}'
 
 # Reply Keyboard
 reply_keyboard = [['/picture 🖼']]
@@ -59,19 +59,19 @@ date_fmt = '%Y-%m-%d'
 def check_api_data_and_send_info(bot, update, user_chat_id, media_type, title, image, explanation, randomize_date, is_old_picture):
 
     def send_information_to_user(bot, user_chat_id, title, image, explanation):
-        bot.send_message(chat_id = user_chat_id, text = '<b>{}</b>'.format(title), parse_mode = 'HTML')
+        bot.send_message(chat_id = user_chat_id, text = f'<b>{title}</b>', parse_mode = 'HTML')
         bot.send_photo(chat_id = user_chat_id, photo = image)
         bot.send_message(chat_id = user_chat_id, text = explanation)
 
     if 'image' or 'video' in media_type:
         send_information_to_user(bot, user_chat_id, title, image, explanation)
         if is_old_picture != True:
-            bot.send_message(chat_id = user_chat_id, text = '<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {} </code>'.format(randomize_date), parse_mode = 'HTML')
-        print("User {} and ID {} called the /picture command!".format(update.message.chat_id, str(update.message.from_user.username)))
+            bot.send_message(chat_id = user_chat_id, text = f'<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {randomize_date} </code>', parse_mode = 'HTML')
+        print(f"User {user_chat_id} and ID {str(update.message.from_user.username)} called the /picture command!")
 
     else:
-        bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
-        print("User {} and ID {} called the /picture command and an error occured!".format(update.message.chat_id, str(update.message.from_user.username)))
+        bot.send_message(chat_id = user_chat_id, text = "Sorry, I couldn't deliver the image / video! An error occured!")
+        print(f"User {user_chat_id} and ID {str(update.message.from_user.username)} called the /picture command and an error occured!")
 
 
 # Typing animation to show to user to imitate human interaction
@@ -93,7 +93,7 @@ def start(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text = "Hello! Thank you for starting me! Use the /picture command to see today's NASA Image of the Day!")
 
     print(datetime.now(est_timezone).strftime(fmt))
-    print("User {} and ID {} started the bot!".format(update.message.chat_id, str(update.message.from_user.username)))
+    print(f"User {update.message.chat_id} and ID {str(update.message.from_user.username)} started the bot!")
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -102,6 +102,8 @@ dispatcher.add_handler(start_handler)
 @send_typing_action
 def pictureoftheday_message(bot, update):
     
+    start_time = time.time()
+
     start_date = date(1995, 6, 16)
     end = (datetime.now(est_timezone) - timedelta(1)).strftime(date_fmt)
     end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10]))
@@ -132,14 +134,16 @@ def pictureoftheday_message(bot, update):
             check_api_data_and_send_info(bot, update, update.message.chat_id, nasa_data['media_type'], nasa_data['title'], nasa_data['url'], nasa_data['explanation'], randomize_date = randomize_date, is_old_picture = False)
         
         else:
-            bot.send_message(chat_id = update.message.chat_id, text = "You're doing that too much. Please try again in {} minute(s)!".format(10 - int(minutes_diff)))
-            print("User {} and ID {} spammed the /picture command and hit a cooldown!".format(update.message.chat_id, str(update.message.from_user.username)))
+            bot.send_message(chat_id = update.message.chat_id, text = f"You're doing that too much. Please try again in {10 - int(minutes_diff)} minute(s)!")
+            print(f"User {update.message.chat_id} and ID {str(update.message.from_user.username)} spammed the /picture command and hit a cooldown!")
 
     # A new user has invoked the picture command since the chat_id cannot be found in database
     else:
         main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username, 'count': 1})
 
         check_api_data_and_send_info(bot, update, update.message.chat_id, nasa_data['media_type'], nasa_data['title'], nasa_data['url'], nasa_data['explanation'], randomize_date = randomize_date, is_old_picture = False)
+
+    print(f"{time.time() - start_time} seconds")
     
 pictureoftheday_message_handler = CommandHandler('picture', pictureoftheday_message)
 dispatcher.add_handler(pictureoftheday_message_handler)
@@ -162,7 +166,7 @@ def old_picture(bot, update, args):
         end = (datetime.now(est_timezone) - timedelta(1)).strftime(date_fmt)
         end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10]))
 
-        old_pictures_url = 'https://api.nasa.gov/planetary/apod?api_key={}&date={}-{}-{}'.format(config.api_key, year, month, day)
+        old_pictures_url = f'https://api.nasa.gov/planetary/apod?api_key={config.api_key}&date={year}-{month}-{day}'
         old_picture_data = requests.get(old_pictures_url).json()
 
         if start_date <= entered_date <= end_date:
@@ -187,8 +191,8 @@ def old_picture(bot, update, args):
                     check_api_data_and_send_info(bot, update, update.message.chat_id, old_picture_data['media_type'], old_picture_data['title'], old_picture_data['url'], old_picture_data['explanation'], randomize_date = 100, is_old_picture = True)
 
                 else:
-                    bot.send_message(chat_id = update.message.chat_id, text = "You're doing that too much. Please try again in {} minute(s)!".format(2 - int(minutes_diff)))
-                    print("User {} and ID {} spammed the /old_picture command and hit a cooldown!".format(update.message.chat_id, str(update.message.from_user.username)))
+                    bot.send_message(chat_id = update.message.chat_id, text = f"You're doing that too much. Please try again in {2 - int(minutes_diff)} minute(s)!")
+                    print(f"User {update.message.chat_id} and ID {str(update.message.from_user.username)} spammed the /old_picture command and hit a cooldown!")
 
             else:
                 old_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username, 'count': 1})
@@ -196,14 +200,14 @@ def old_picture(bot, update, args):
                 check_api_data_and_send_info(bot, update, update.message.chat_id, old_picture_data['media_type'], old_picture_data['title'], old_picture_data['url'], old_picture_data['explanation'], randomize_date = 100, is_old_picture = True)
             
         else:
-            bot.send_message(chat_id = update.message.chat_id, text = "Only dates between 16 June 1995 and {} are supported. Please try again!".format((datetime.now(est_timezone) - timedelta(1)).strftime('%d %B %Y')))
+            bot.send_message(chat_id = update.message.chat_id, text = f"Only dates between 16 June 1995 and {(datetime.now(est_timezone) - timedelta(1)).strftime('%d %B %Y')} are supported. Please try again!")
     else:
         start_date = date(1995, 6, 16)
         end = (datetime.now(est_timezone) - timedelta(1)).strftime(date_fmt)
         end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10]))
         randomize_date = fake.date_between(start_date = start_date, end_date = end_date).strftime('%d %B %Y')
         
-        bot.send_message(chat_id = update.message.chat_id, text = "Please enter a date after the command! For example: <code>/old_picture {} </code>".format(randomize_date), parse_mode = 'HTML')
+        bot.send_message(chat_id = update.message.chat_id, text = f"Please enter a date after the command! For example: <code>/old_picture {randomize_date} </code>", parse_mode = 'HTML')
 
 old_picture_handler = CommandHandler('old_picture', old_picture, pass_args = True)
 dispatcher.add_handler(old_picture_handler)
@@ -214,7 +218,7 @@ def unknown(bot, update):
     bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please type /picture! or /old_picture")
 
     print(datetime.now(est_timezone))
-    print("User {} and ID {} called an unknown command!".format(update.message.chat_id, str(update.message.from_user.username)))
+    print(f"User {update.message.chat_id} and ID {str(update.message.from_user.username)} called an unknown command!")
 
 unknown_handler = MessageHandler(Filters.command, unknown)
 dispatcher.add_handler(unknown_handler)
