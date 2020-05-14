@@ -65,8 +65,10 @@ def check_api_data_and_send_info(bot, update, user_chat_id, media_type, title, i
 
     if 'image' or 'video' in media_type:
         send_information_to_user(bot, user_chat_id, title, image, explanation)
-        if is_old_picture != True:
+
+        if main_potd_db.search((Query()['chat_id'] == user_chat_id) & (Query()['command_banner_shown'] == False)) == []:
             bot.send_message(chat_id = user_chat_id, text = f'<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {randomize_date} </code>', parse_mode = 'HTML')
+
         print(f"User {user_chat_id} and ID {str(update.message.from_user.username)} called the /picture command!")
 
     else:
@@ -112,7 +114,11 @@ def pictureoftheday_message(bot, update):
 
     nasa_data = requests.get(nasa_url).json()
 
-    # If user exists, search the last time they invoked the picture command
+    '''
+    If user doesn't exist, go to the else loop and populate data into db
+
+    If user_id EXISTs in the db, check the time and extract minute difference
+    '''
     if main_potd_db.contains(Query()['chat_id'] == update.message.chat_id):
 
         user = Query()
@@ -125,10 +131,10 @@ def pictureoftheday_message(bot, update):
 
         # Calculate how much time has passed since we served the image
         minutes_diff = (current_time - old_time).total_seconds() / 60.0
-
+            
         # If more than 10 minutes have passed, they can reuse the command
         if int(minutes_diff) >= 0:
-            main_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username)}, Query()['chat_id'] == update.message.chat_id)
+            main_potd_db.upsert({'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': str(update.message.from_user.username), 'command_banner_shown': False}, Query()['chat_id'] == update.message.chat_id)
             main_potd_db.update(increment('count'), Query()['chat_id'] == update.message.chat_id)
 
             check_api_data_and_send_info(bot, update, update.message.chat_id, nasa_data['media_type'], nasa_data['title'], nasa_data['url'], nasa_data['explanation'], randomize_date = randomize_date, is_old_picture = False)
@@ -139,7 +145,7 @@ def pictureoftheday_message(bot, update):
 
     # A new user has invoked the picture command since the chat_id cannot be found in database
     else:
-        main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username, 'count': 1})
+        main_potd_db.insert({'chat_id': update.message.chat_id, 'time': str(datetime.now(est_timezone).strftime(fmt)), 'username': update.message.from_user.username, 'count': 1, 'command_banner_shown': True})
 
         check_api_data_and_send_info(bot, update, update.message.chat_id, nasa_data['media_type'], nasa_data['title'], nasa_data['url'], nasa_data['explanation'], randomize_date = randomize_date, is_old_picture = False)
 
@@ -215,7 +221,7 @@ dispatcher.add_handler(old_picture_handler)
 # Unknown command for error handling
 @send_typing_action
 def unknown(bot, update):
-    bot.send_message(chat_id = update.message.chat_id, text="Sorry, I didn't understand that command! Please type /picture! or /old_picture")
+    bot.send_message(chat_id = update.message.chat_id, text = "Sorry, I didn't understand that command! Please type /picture! or /old_picture")
 
     print(datetime.now(est_timezone))
     print(f"User {update.message.chat_id} and ID {str(update.message.from_user.username)} called an unknown command!")
