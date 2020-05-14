@@ -66,6 +66,7 @@ def check_api_data_and_send_info(bot, update, user_chat_id, media_type, title, i
     if 'image' or 'video' in media_type:
         send_information_to_user(bot, user_chat_id, title, image, explanation)
 
+        # Show command banner if the user is new
         if main_potd_db.search((Query()['chat_id'] == user_chat_id) & (Query()['command_banner_shown'] == False)) == []:
             bot.send_message(chat_id = user_chat_id, text = f'<b> NEW! </b> You can now access old pictures of the day! Type for example: <code> /old_picture {randomize_date} </code>', parse_mode = 'HTML')
 
