@@ -1,9 +1,19 @@
-<h3 align="center">Picture of The Day Bot for Telegram</h3>
-
 <p align="center">
   <a href="" rel="noopener">
- <img src="https://i.imgur.com/IIt49tD.jpg" alt="Bot logo" height = "100" weight = "100"></a>
+ <img width=200px height=200px src="https://i.imgur.com/V4WEJJN.jpg" alt="Bot logo"></a>
 </p>
+
+<h3 align="center">Picture of The Day Bot for Telegram</h3>
+
+<div align="center">
+
+![Language](https://img.shields.io/badge/Python-3.7-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot/badge)](https://www.codefactor.io/repository/github/sumitagr/pictureoftheday-bot)
+
+</div>
+
+---
 
 <p align="center"> 🤖 A Telegram bot that retrieve's NASA renowned picture of the day service (APOD) with a single command!
     <br> 
@@ -34,6 +44,8 @@ The user is provided with two GUI options, an on-screen button to easily get the
 
 Once the bot receives this request, it uses NASA APOD's API to retrieve the data in JSON format. The information is then converted into a message that is sent to the user within 5 seconds using Telegram's API.
 
+The bot utilizes the NLTK python library to convert the giant wall of NASA text into a minimal summary.
+
 The entire bot is written in Python 3.7
 
 ## 🎈 Usage <a name = "usage"></a>
@@ -50,6 +62,7 @@ Please note: The bot could be slow sometimes as it depends on NASA's API request
 ## ⛏️ Built Using <a name = "built_using"></a>
 + [Python-Telegram-Bot](https://python-telegram-bot.org/) - Unofficial Python wrapper for Telegram's API
 + [Amazon AWS EC2](https://aws.amazon.com/ec2/) - Amazon AWS's cloud computing service
++ NLTK - The Natural Language Toolkit Python library for text summary and language processing
 + Requests - Requests library for HTTP Requests
 + Logging - Logging library for debugging
 + Time / DateTime - Time libraries
