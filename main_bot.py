@@ -33,6 +33,9 @@ from dateutil.parser import parse
 from faker import Faker
 fake = Faker()
 
+# Import text summarizer function
+from text_summarizer_function import summarize_text
+
 # Importing the Updater object with token for updates from Telegram API
 # Declaring the Dispatcher object to send information to user
 # Creating the bot variable and adding our token
@@ -59,9 +62,8 @@ date_fmt = '%Y-%m-%d'
 def check_api_data_and_send_info(bot, update, user_chat_id, media_type, title, image, explanation, randomize_date, is_old_picture):
 
     def send_information_to_user(bot, user_chat_id, title, image, explanation):
-        bot.send_message(chat_id = user_chat_id, text = f'<b>{title}</b>', parse_mode = 'HTML')
         bot.send_photo(chat_id = user_chat_id, photo = image)
-        bot.send_message(chat_id = user_chat_id, text = explanation)
+        bot.send_message(chat_id = user_chat_id, text = f'<b>{title}</b>' + "\n \n" + summarize_text(explanation), parse_mode = 'HTML')
 
     if 'image' or 'video' in media_type:
         send_information_to_user(bot, user_chat_id, title, image, explanation)
